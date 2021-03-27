@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { device } from "../../constants";
 import { font, bg, fontSize } from "../../style/sharedStyle";
 const Board = styled.div`
-  width: 20%;
+  width: auto;
   height: 20%;
   border-radius: 3%;
-  ${fontSize.md};
+  ${fontSize.sm};
   border: 5px solid #ffffff;
   box-sizing: border-box;
   ${bg.lightPurple};
@@ -19,7 +19,7 @@ const Board = styled.div`
 `;
 
 const ScoreBoard = memo((props) => {
-  return <Board>{props.score}</Board>;
+  return <Board>1. User: {props.score}</Board>;
 });
 
 export { ScoreBoard };

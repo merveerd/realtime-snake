@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { device } from "../constants";
 import { font, bg, fontSize } from "../style/sharedStyle";
 const StyledButton = styled.button`
-  width: 10%;
   height: auto;
+  align-self: center;
   border-radius: 3%;
-  ${fontSize.md};
+  ${fontSize.sm};
   border: 5px solid #ffffff;
   box-sizing: border-box;
   ${bg.lightPurple};
@@ -24,7 +24,11 @@ const StyledButton = styled.button`
 `;
 
 const Button = memo((props) => {
-  return <StyledButton onClick={props.onClick}>{props.text}</StyledButton>;
+  return (
+    <StyledButton style={props.style} onClick={props.onClick}>
+      {props.text}
+    </StyledButton>
+  );
 });
 
 export { Button };

@@ -11,7 +11,7 @@ export const font = {
     color: ##1e1f1e;
   `,
   pinky: css`
-    color: #e88574;
+    color: #f7947c;
   `,
 };
 
@@ -38,6 +38,9 @@ export const bg = {
     background-color: ##1e1f1e;
   `,
   pinky: css`
-    background-color: #e88574;
+    background-color: #f7947c;
+  `,
+  blue: css`
+    background-color: #34e1eb;
   `,
 };

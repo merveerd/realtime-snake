@@ -1,10 +1,14 @@
-import { SET_ROOM_INFO, CHANGE_GAME_STATUS } from "../actions/types";
+import { SET_ROOM_INFO, SET_SCORE, CHANGE_GAME_STATUS } from "../actions/types";
 
 const INITIAL_STATE = {
   gridNumber: "",
   playerNumber: 0,
   gameActive: true,
   winner: "",
+  score: {
+    1: 0,
+    2: 0,
+  },
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -15,9 +19,13 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, playerNumber, gridNumber };
     }
 
+    case SET_SCORE: {
+      const score = action.payload;
+      return { ...state, score };
+    }
+
     case CHANGE_GAME_STATUS: {
       const gameActive = action.payload.gameActive;
-
       const winner = action.payload.winner;
       return { ...state, gameActive: gameActive, winner };
     }

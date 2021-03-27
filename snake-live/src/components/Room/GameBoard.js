@@ -42,10 +42,13 @@ const GameBoard = memo((props) => {
   }, [gameActive]);
 
   const handleGameState = (state) => {
-    let score = {};
-    score = { score1: state.players[0].score, score2: state.players[1].score };
+    state = JSON.parse(state);
+    props.setScore({
+      1: state.players[0].score,
+      2: state.players[1].score,
+    });
 
-    requestAnimationFrame(() => paintGame(JSON.parse(state)));
+    requestAnimationFrame(() => paintGame(state));
   };
   let food, size;
   const paintGame = (state) => {
@@ -55,11 +58,11 @@ const GameBoard = memo((props) => {
     context.fillStyle = "#e88574"; //board
     context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-    context.fillStyle = "#66c2ff"; //food
+    context.fillStyle = "#34e1eb"; //food
     context.fillRect(food.x * size, food.y * size, size, size);
 
     drawGrid();
-    drawSnake(state.players[0], size, "#9cf0cd");
+    drawSnake(state.players[0], size, "#a060d1");
 
     playerNumber === 2 && drawSnake(state.players[1], size, "red");
   };

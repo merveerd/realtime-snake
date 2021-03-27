@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { SocketContext } from "../socketClient";
 import { Button, GameBoard, Result, ScoreBoard } from "../components";
-import { changeGameStatus } from "../actions";
+import { changeGameStatus, setScore } from "../actions";
 
 const BarContainer = styled.div`
   width: 100%;
@@ -20,7 +20,7 @@ const RoomContainer = styled.div`
   align-items: center;
 `;
 const Room = (props) => {
-  const { winner, changeGameStatus } = props;
+  const { winner, playerNumber, score, setScore, changeGameStatus } = props;
   const history = useHistory();
   const socket = useContext(SocketContext);
 
@@ -55,7 +55,7 @@ const Room = (props) => {
   return (
     <RoomContainer>
       <BarContainer>
-        <ScoreBoard score={props.score}></ScoreBoard>
+        <ScoreBoard score={score["1"]}></ScoreBoard>
         <Button
           text="Cancel"
           onClick={() => {
@@ -63,21 +63,32 @@ const Room = (props) => {
           }}
         />
       </BarContainer>
-      <GameBoard />
-      {winner && <Result winner={winner} playAgain={playAgain}></Result>}
+      <GameBoard setScore={setScore} />
+
+      {winner && (
+        <Result
+          playerNumber={playerNumber}
+          winner={winner}
+          score={score}
+          playAgain={playAgain}
+        ></Result>
+      )}
     </RoomContainer>
   );
 };
 
 const mapDispatchToProps = {
   changeGameStatus,
+  setScore,
 };
 
 const mapStateToProps = ({ roomResponse }) => {
-  const { winner } = roomResponse;
+  const { winner, score, playerNumber } = roomResponse;
 
   return {
     winner,
+    score,
+    playerNumber,
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Room);

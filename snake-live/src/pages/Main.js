@@ -14,7 +14,6 @@ const MainContainer = styled.div`
   justify-content: center;
   flex-direction: column;
   align-items: center;
-
   ${bg.pinky};
   ${font.white}
 `;

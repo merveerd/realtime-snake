@@ -4,8 +4,8 @@ export const font = {
   white: css`
     color: #ffffff;
   `,
-  lightGreen: css`
-    color: #9cf0cd;
+  lightPurple: css`
+    color: #a060d1;
   `,
   darkGray: css`
     color: ##1e1f1e;
@@ -15,12 +15,24 @@ export const font = {
   `,
 };
 
+export const fontSize = {
+  sm: css`
+    font-size: 1.3rem;
+  `,
+  md: css`
+    font-size: 2rem;
+  `,
+  lrg: css`
+    font-size: 3rem;
+  `,
+};
+
 export const bg = {
   white: css`
     background-color: #ffffff;
   `,
-  lightGreen: css`
-    background-color: #9cf0cd;
+  lightPurple: css`
+    background-color: #a060d1;
   `,
   darkGray: css`
     background-color: ##1e1f1e;

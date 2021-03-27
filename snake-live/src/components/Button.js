@@ -1,15 +1,18 @@
 import React, { memo } from "react";
 import styled from "styled-components";
 import { device } from "../constants";
-import { font, bg } from "../style/sharedStyle";
+import { font, bg, fontSize } from "../style/sharedStyle";
 const StyledButton = styled.button`
   width: 10%;
-  height: 1.3rem;
-  border-radius: 2px;
-  border: none;
+  height: auto;
+  border-radius: 3%;
+  ${fontSize.md};
+  border: 5px solid #ffffff;
   box-sizing: border-box;
-  ${bg.pinky};
-  ${font.white}
+  ${bg.lightPurple};
+  ${font.white};
+  margin: 1%;
+  padding: 1%;
   outline: none;
   &:hover {
     cursor: pointer;

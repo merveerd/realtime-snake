@@ -1,8 +1,8 @@
 import React, { memo } from "react";
 import styled from "styled-components";
-import { device } from "../constants";
-import { Button } from "./Button";
-import { font, bg } from "../style/sharedStyle";
+import { device } from "../../constants";
+import { Button } from "../Button";
+import { font, bg } from "../../style/sharedStyle";
 const ResultContainer = styled.div`
   position: relative;
   display: flex;

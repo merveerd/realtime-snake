@@ -1,14 +1,37 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
+import styled from "styled-components";
 import { Button, Input } from "../components";
-
 import { SocketContext } from "../socketClient";
 import { changeGameStatus, setRoomInfo } from "../actions";
+import { font, bg } from "../style/sharedStyle";
+
+const MainContainer = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+
+  ${bg.pinky};
+  ${font.white}
+`;
+
+const NewGameContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Main = (props) => {
   const history = useHistory();
   const socket = useContext(SocketContext);
+  const [openInput, setOpenInput] = useState(null);
+  const [gameCode, setGameCode] = useState(null);
+
   const newGame = () => {
     props.changeGameStatus({ gameActive: true });
     socket.emit("newGame");
@@ -23,18 +46,29 @@ const Main = (props) => {
     }); //any other info too
   };
 
+  const enterCode = () => {
+    setOpenInput(true);
+  };
   return (
-    <div>
-      <Button text=" Single Player Game Start" onClick={newGame} />
-      <Button text="Two Player Game Start" onClick={newGame} />
-      <Input placeholder="Enter Game Code"></Input>
-      {/* <Button text="Join game" onClick={joinGame} />
-      {gameCode && ( //in Two Player Game Start
+    <MainContainer>
+      <NewGameContainer>
+        <Button text=" Single Player" onClick={newGame} />
+        <Button text="Two Player" onClick={newGame} />
+      </NewGameContainer>
+
+      {openInput ? (
+        <h1>
+          Enter Code : <Input placeholder="Code"></Input>
+        </h1>
+      ) : (
+        <Button text="Join Game" onClick={enterCode}></Button>
+      )}
+      {/* {gameCode && ( //in Two Player Game
         <h1>
           Game code to join: <GameCodeDisplay>{gameCode}</GameCodeDisplay>
         </h1>
       )} */}
-    </div>
+    </MainContainer>
   );
 };
 

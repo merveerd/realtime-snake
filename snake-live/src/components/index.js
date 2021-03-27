@@ -1,4 +1,5 @@
 export * from "./Button";
 export * from "./Input";
-export * from "./GameBoard";
-export * from "./Result";
+export * from "./Room/GameBoard";
+export * from "./Room/Result";
+export * from "./Room/ScoreBoard";

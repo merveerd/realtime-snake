@@ -1,22 +1,21 @@
 import React, { memo } from "react";
 import styled from "styled-components";
 import { device } from "../constants";
-import { font, bg } from "../style/sharedStyle";
+import { font, bg, fontSize } from "../style/sharedStyle";
 const StyledInput = styled.input`
-  width: 10%;
-  height: 1.3rem;
+  width: auto;
+  height: auto;
   border-radius: 2px;
   border: none;
   box-sizing: border-box;
+  display: flex;
+  align-self: center;
   ${bg.pinky};
   ${font.white}
+  ${fontSize.md};
   outline: none;
   &:hover {
     cursor: pointer;
-  }
-
-  @media only screen and ${device.xs} {
-    height: 2rem;
   }
 `;
 

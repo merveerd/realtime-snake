@@ -1,6 +1,6 @@
 import React, { memo, useRef, useContext, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { SocketContext } from "../socketClient";
+import { SocketContext } from "../../socketClient";
 
 const GameBoard = memo((props) => {
   const room = useSelector((state) => state.roomResponse);
@@ -41,15 +41,12 @@ const GameBoard = memo((props) => {
     }
   }, [gameActive]);
 
-  const handleGameState = (gameState) => {
-    if (!gameActive) {
-      console.log("return state", gameActive);
+  const handleGameState = (state) => {
+    let score = {};
+    score = { score1: state.players[0].score, score2: state.players[1].score };
 
-      return;
-    }
-    requestAnimationFrame(() => paintGame(JSON.parse(gameState)));
+    requestAnimationFrame(() => paintGame(JSON.parse(state)));
   };
-
   let food, size;
   const paintGame = (state) => {
     food = state.food;

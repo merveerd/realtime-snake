@@ -1,10 +1,24 @@
 import React, { useContext, useEffect } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
+import styled from "styled-components";
 import { SocketContext } from "../socketClient";
-import { Button, GameBoard, Result } from "../components";
+import { Button, GameBoard, Result, ScoreBoard } from "../components";
 import { changeGameStatus } from "../actions";
 
+const BarContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const RoomContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 const Room = (props) => {
   const { winner, changeGameStatus } = props;
   const history = useHistory();
@@ -39,16 +53,19 @@ const Room = (props) => {
   };
 
   return (
-    <div>
-      <Button
-        text="cancel"
-        onClick={() => {
-          history.push("");
-        }}
-      />
+    <RoomContainer>
+      <BarContainer>
+        <ScoreBoard score={props.score}></ScoreBoard>
+        <Button
+          text="Cancel"
+          onClick={() => {
+            history.push("");
+          }}
+        />
+      </BarContainer>
       <GameBoard />
       {winner && <Result winner={winner} playAgain={playAgain}></Result>}
-    </div>
+    </RoomContainer>
   );
 };
 

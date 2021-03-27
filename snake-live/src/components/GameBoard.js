@@ -1,84 +1,94 @@
 import React, { memo, useRef, useContext, useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { SocketContext } from "../socketClient";
 
 const GameBoard = memo((props) => {
-  const numCells = 20;
+  const room = useSelector((state) => state.roomResponse);
+  const { playerNumber, gridNumber, gameActive } = room;
+
   const canvasRef = useRef(null);
   const socket = useContext(SocketContext);
 
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [snake, setSnake] = useState([
-    { x: 0, y: 0 },
-    { x: 1, y: 0 },
-  ]);
   const [context, setContext] = useState(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     setContext(context);
-    context.fillStyle = "blue";
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-    draw(context);
-    document.body.addEventListener("keydown", changeDirectionWithKeys);
-
-    return () => {
-      document.body.removeEventListener("keydown", changeDirectionWithKeys);
-    };
   }, []);
 
-  socket.on("position", function (data) {
-    setPosition(data);
-
-    context && context.fillRect(position.x, position.y, 20, 20);
-  });
-
-  const setDirection = (direction) => {
-    socket.emit("move", direction);
-  };
-
-  //keyboard listeners
-  const changeDirectionWithKeys = (e) => {
-    let { keyCode } = e;
-    switch (keyCode) {
-      case 37:
-        setDirection("left");
-        break;
-      case 38:
-        setDirection("up");
-        break;
-      case 39:
-        setDirection("right");
-        break;
-      case 40:
-        setDirection("down");
-        break;
-      default:
-        break;
+  useEffect(() => {
+    if (context && gridNumber && playerNumber) {
+      socket.on("gameState", handleGameState);
+      return () => {
+        socket.off("gameState", handleGameState);
+      };
     }
+  }, [context, gridNumber, playerNumber]);
+
+  useEffect(() => {
+    if (gameActive) {
+      const keyDown = (e) => {
+        if (gameActive) {
+          socket.emit("keydown", e.keyCode);
+        }
+      };
+
+      document.body.addEventListener("keydown", keyDown, true);
+      return () => {
+        document.body.removeEventListener("keydown", keyDown, true);
+      };
+    }
+  }, [gameActive]);
+
+  const handleGameState = (gameState) => {
+    if (!gameActive) {
+      console.log("return state", gameActive);
+
+      return;
+    }
+    requestAnimationFrame(() => paintGame(JSON.parse(gameState)));
   };
 
-  const draw = (ctx) => {
-    //move it to the helper
-    const cellSize = Math.floor(ctx.canvas.width / numCells);
-    const drawGrid = () => {
-      //make seperate initialization
-      ctx.beginPath();
-      ctx.strokeStyle = "pink";
-      for (let i = 0; i < numCells + 1; i++) {
-        ctx.moveTo(i * cellSize, 0);
-        ctx.lineTo(i * cellSize, cellSize * numCells);
+  let food, size;
+  const paintGame = (state) => {
+    food = state.food;
+    size = context.canvas.width / gridNumber;
 
-        ctx.moveTo(0, i * cellSize);
-        ctx.lineTo(cellSize * numCells, i * cellSize);
-      }
+    context.fillStyle = "#e88574"; //board
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-      ctx.stroke();
-    };
+    context.fillStyle = "#66c2ff"; //food
+    context.fillRect(food.x * size, food.y * size, size, size);
 
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     drawGrid();
+    drawSnake(state.players[0], size, "#9cf0cd");
+
+    playerNumber === 2 && drawSnake(state.players[1], size, "red");
+  };
+
+  const drawGrid = () => {
+    const cellSize = Math.floor(context.canvas.width / gridNumber);
+    context.beginPath();
+    context.strokeStyle = "pink";
+    for (let i = 0; i < gridNumber + 1; i++) {
+      context.moveTo(i * cellSize, 0);
+      context.lineTo(i * cellSize, cellSize * gridNumber);
+
+      context.moveTo(0, i * cellSize);
+      context.lineTo(cellSize * gridNumber, i * cellSize);
+    }
+
+    context.stroke();
+  };
+
+  const drawSnake = (playerState, size, colour) => {
+    const snake = playerState.snake;
+
+    context.fillStyle = colour;
+    for (let cell of snake) {
+      context.fillRect(cell.x * size, cell.y * size, size, size);
+    }
   };
 
   return <canvas width="800" height="800" ref={canvasRef} />;

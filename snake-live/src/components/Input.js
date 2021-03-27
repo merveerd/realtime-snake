@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import styled from "styled-components";
 import { device } from "../constants";
 import { font, bg } from "../style/sharedStyle";
-const StyledButton = styled.button`
+const StyledInput = styled.input`
   width: 10%;
   height: 1.3rem;
   border-radius: 2px;
@@ -20,8 +20,8 @@ const StyledButton = styled.button`
   }
 `;
 
-const Button = memo((props) => {
-  return <StyledButton onClick={props.onClick}>{props.text}</StyledButton>;
+const Input = memo((props) => {
+  return <StyledInput placeholder={props.placeholder}></StyledInput>;
 });
 
-export { Button };
+export { Input };

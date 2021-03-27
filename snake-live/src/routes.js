@@ -1,7 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Route, Switch, useParams } from "react-router-dom";
-import { Main, Room } from "./pages";
+import Main from "./pages/Main";
+import Room from "./pages/Room";
 const ROUTES = [
   {
     path: "/",

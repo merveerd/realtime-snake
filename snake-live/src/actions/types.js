@@ -1,1 +1,2 @@
-export const ADD_ROOMID = "ADD_ROOMID";
+export const SET_ROOM_INFO = "SET_ROOM_INFO";
+export const CHANGE_GAME_STATUS = "CHANGE_GAME_STATUS";

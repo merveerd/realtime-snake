@@ -1,4 +1,4 @@
-const GRID_NUMBER = 20;
+const GRID_NUMBER = 80;
 
 const initGame = () => {
   const state = createGameState();
@@ -29,7 +29,7 @@ const createGameState = () => {
       },
       {
         pos: {
-          x: 18,
+          x: 10,
           y: 10,
         },
         axis: "",
@@ -38,9 +38,9 @@ const createGameState = () => {
           y: 0,
         },
         snake: [
-          { x: 20, y: 10 },
-          { x: 19, y: 10 },
-          { x: 18, y: 10 },
+          { x: 10, y: 10 },
+          { x: 9, y: 10 },
+          { x: 8, y: 10 },
         ],
         score: 0,
       },
@@ -55,6 +55,8 @@ const gameLoop = (state) => {
     return;
   }
 
+  //handle this in one function
+  // gameState.players.forEach((player) => {});
   const playerOne = state.players[0];
   const playerTwo = state.players[1];
 
@@ -70,8 +72,8 @@ const gameLoop = (state) => {
     playerOne.pos.y < 0 ||
     playerOne.pos.y > GRID_NUMBER
   ) {
-    console.log("2.1");
-    return 2;
+    randomSnake(playerOne);
+    playerOne.score = 0;
   }
 
   if (
@@ -80,13 +82,13 @@ const gameLoop = (state) => {
     playerTwo.pos.y < 0 ||
     playerTwo.pos.y > GRID_NUMBER
   ) {
-    console.log("1.1");
-    return 1;
+    randomSnake(playerTwo);
+    playerTwo.score = 0;
   }
 
   if (state.food.x === playerOne.pos.x && state.food.y === playerOne.pos.y) {
     playerOne.snake.push({ ...playerOne.pos });
-    playerOne.score += 10;
+    playerOne.score += 100;
     playerOne.pos.x += playerOne.vel.x;
     playerOne.pos.y += playerOne.vel.y;
     randomFood(state);
@@ -94,7 +96,7 @@ const gameLoop = (state) => {
 
   if (state.food.x === playerTwo.pos.x && state.food.y === playerTwo.pos.y) {
     playerTwo.snake.push({ ...playerTwo.pos });
-    playerTwo.score += 10;
+    playerTwo.score += 100;
     playerTwo.pos.x += playerTwo.vel.x;
     playerTwo.pos.y += playerTwo.vel.y;
     randomFood(state);
@@ -102,9 +104,14 @@ const gameLoop = (state) => {
 
   if (playerOne.vel.x || playerOne.vel.y) {
     for (let cell of playerOne.snake) {
-      if (cell.x === playerOne.pos.x && cell.y === playerOne.pos.y) {
-        console.log("2.2");
-        return 2;
+      if (
+        (cell.x === playerOne.pos.x && cell.y === playerOne.pos.y) ||
+        ((playerTwo.vel.x || playerTwo.vel.y) &&
+          cell.x === playerTwo.pos.x &&
+          cell.y === playerTwo.pos.y)
+      ) {
+        randomSnake(playerOne);
+        playerOne.score = 0;
       }
     }
 
@@ -114,9 +121,14 @@ const gameLoop = (state) => {
 
   if (playerTwo.vel.x || playerTwo.vel.y) {
     for (let cell of playerTwo.snake) {
-      if (cell.x === playerTwo.pos.x && cell.y === playerTwo.pos.y) {
-        console.log("1.2");
-        return 1;
+      if (
+        (cell.x === playerTwo.pos.x && cell.y === playerTwo.pos.y) ||
+        ((playerOne.vel.x || playerOne.vel.y) &&
+          cell.x === playerOne.pos.x &&
+          cell.y === playerOne.pos.y)
+      ) {
+        randomSnake(playerTwo);
+        playerTwo.score = 0;
       }
     }
 
@@ -125,6 +137,19 @@ const gameLoop = (state) => {
   }
 
   return false;
+};
+
+const randomNumber = () => {
+  return Math.floor(Math.random() * (GRID_NUMBER - 20));
+};
+const randomSnake = (player) => {
+  const newPos = { x: randomNumber(), y: randomNumber() };
+  player.pos = newPos;
+  player.snake = [
+    { x: newPos.x, y: newPos.y },
+    { x: newPos.x + 1, y: newPos.y },
+    { x: newPos.x + 2, y: newPos.y },
+  ];
 };
 
 const randomFood = (state) => {

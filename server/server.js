@@ -6,7 +6,7 @@ const server = http.createServer(app);
 const { initGame, gameLoop, getDirection } = require("./game");
 const { makeid } = require("./utils");
 
-const FRAME_RATE = 10,
+const FRAME_RATE = 20,
   state = {},
   clientRooms = {};
 
@@ -20,7 +20,7 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
   let duration,
     gameInterval,
-    counter = 180;
+    counter = 5;
   const setInitValues = (gameId) => {
     socket.join(gameId);
     socket.emit("init", state[gameId]);
@@ -48,6 +48,7 @@ io.on("connection", (socket) => {
 
   const countDown = (gameId) => {
     counter--;
+    socket.emit("timer", counter);
     if (counter == 0) {
       finishGame(gameId);
     }
@@ -55,11 +56,12 @@ io.on("connection", (socket) => {
 
   const stopGame = (gameId) => {
     state[gameId] = null;
+    counter = 5;
     clearInterval(gameInterval);
     clearInterval(duration);
   };
 
-  const handleNewGame = () => {
+  const createSingleGame = () => {
     let gameId = makeid(10);
     clientRooms[socket.id] = gameId;
     socket.emit("gameCode", gameId); //for two
@@ -104,7 +106,7 @@ io.on("connection", (socket) => {
   };
 
   socket.on("keydown", handleKeydown);
-  socket.on("newGame", handleNewGame);
+  socket.on("newGame", createSingleGame);
 });
 
 const emitGameState = (room, gameState) => {

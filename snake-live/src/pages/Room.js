@@ -1,9 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { SocketContext } from "../socketClient";
-import { Button, GameBoard, Result, ScoreBoard } from "../components";
+import { Bar, GameBoard, Result } from "../components";
 import { changeGameStatus, setScore } from "../actions";
 
 const BarContainer = styled.div`
@@ -23,6 +23,7 @@ const Room = (props) => {
   const { winner, playerNumber, score, setScore, changeGameStatus } = props;
   const history = useHistory();
   const socket = useContext(SocketContext);
+  const [time, setTime] = useState(180);
 
   const handleGameOver = (data) => {
     data = JSON.parse(data);
@@ -33,12 +34,17 @@ const Room = (props) => {
     changeGameStatus(gameStatus);
   };
 
+  const setTimer = (s) => {
+    setTime(s);
+  };
+
   useEffect(() => {
     socket.on("gameOver", handleGameOver);
-
+    socket.on("timer", setTimer);
     // unsubscribe from event for preventing memory leaks
     return () => {
       socket.off("gameOver", handleGameOver);
+      socket.off("timer", setTimer);
     };
   }, []);
 
@@ -51,29 +57,17 @@ const Room = (props) => {
     changeGameStatus(gameStatus);
     socket.emit("newGame");
   };
+  const cancelGame = () => {
+    history.push("");
+    socket.emit("cancelGame", true);
+  };
 
   return (
     <RoomContainer>
-      <BarContainer>
-        <ScoreBoard score={score["1"]}></ScoreBoard>
-        <Button
-          text="Cancel"
-          onClick={() => {
-            history.push("");
-            socket.emit("cancelGame", true);
-          }}
-        />
-      </BarContainer>
+      <Bar cancelGame={cancelGame} remainedTime={time}></Bar>
       <GameBoard setScore={setScore} />
 
-      {winner && (
-        <Result
-          playerNumber={playerNumber}
-          winner={winner}
-          score={score}
-          playAgain={playAgain}
-        ></Result>
-      )}
+      {winner && <Result playAgain={playAgain}></Result>}
     </RoomContainer>
   );
 };

@@ -43,10 +43,10 @@ const GameBoard = memo((props) => {
 
   const handleGameState = (state) => {
     state = JSON.parse(state);
-    props.setScore({
-      1: state.players[0].score,
-      2: state.players[1].score,
-    });
+    props.setScore([
+      { score: state.players[0].score, userName: 1 },
+      { score: state.players[1].score, userName: 2 },
+    ]);
 
     requestAnimationFrame(() => paintGame(state));
   };
@@ -90,7 +90,14 @@ const GameBoard = memo((props) => {
     }
   };
 
-  return <canvas width="800" height="800" ref={canvasRef} />;
+  return (
+    <canvas
+      // style={{ width: 800, height: 800 }}
+      width="800"
+      height="800"
+      ref={canvasRef}
+    />
+  );
 });
 
 export { GameBoard };

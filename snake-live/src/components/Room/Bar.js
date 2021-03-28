@@ -1,8 +1,8 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../Button";
 import { ScoreBoard } from "./ScoreBoard";
+import { Timer } from "./Timer";
 
 const BarContainer = styled.div`
   width: 100%;
@@ -11,19 +11,14 @@ const BarContainer = styled.div`
   align-items: center;
 `;
 
-const Bar = memo((props) => {
-  const history = useHistory();
+const Bar = (props) => {
   return (
     <BarContainer>
+      <Timer remainedTime={props.remainedTime} />
       <ScoreBoard score={props.score}></ScoreBoard>
-      <Button
-        text="Cancel"
-        onClick={() => {
-          history.push("");
-        }}
-      />
+      <Button text="Cancel" onClick={props.cancelGame} />
     </BarContainer>
   );
-});
+};
 
 export { Bar };

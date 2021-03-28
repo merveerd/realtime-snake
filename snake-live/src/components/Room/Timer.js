@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import styled from "styled-components";
 import { device } from "../../constants";
 import { font, bg, fontSize } from "../../style/sharedStyle";
@@ -18,11 +18,14 @@ const Board = styled.div`
   }
 `;
 
-const Timer = memo((props) => {
-  const remainedTime = `${Math.floor(props.remainedTime / 60)}:${
+const Timer = (props) => {
+  const remainedTime = `${Math.floor(props.remainedTime / 60)}:${(
     props.remainedTime % 60
-  }`;
+  ).toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+    useGrouping: false,
+  })}`;
   return <Board>{remainedTime}</Board>;
-});
+};
 
 export { Timer };

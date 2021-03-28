@@ -1,8 +1,8 @@
 import React, { memo } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { device } from "../../constants";
 import { Button } from "../Button";
-import { font, bg, fontSize } from "../../style/sharedStyle";
+import { font, fontSize } from "../../style/sharedStyle";
 
 const ResultContainer = styled.div`
   position: absolute;
@@ -12,25 +12,47 @@ const ResultContainer = styled.div`
   flex-direction: column;
   align-items: center;
   height: 10rem;
-`;
-
-const ScoreContainer = styled.div`
-  display: flex;
-  border-radius: 2px;
-  ${fontSize.md}
+  ${fontSize.lrg}
   ${font.lightPurple}
 `;
 
 const Result = memo((props) => {
+  const room = useSelector((state) => state.roomResponse);
+  const { playerNumber, score } = room;
+
+  //berabere issuesu var . SCORES not score
+  const SortedScore = () => {
+    score.map((item) => {
+      return (
+        <p>
+          User {`${item.userName}`}!, score:{`${item.score}`}
+        </p>
+      );
+    });
+  };
+  const ScoreTable = () => {
+    score.sort((a, b) => (a.score > b.score ? 1 : b.score > a.score ? -1 : 0));
+    //score.sort((a, b) => a.score.localeCompare(b.score));
+
+    if (playerNumber === 2) {
+      return (
+        <>
+          {score[0] !== score[1] ? (
+            <p>Winner is User {`${score[0].userName}`}!,</p>
+          ) : (
+            <p>Draw!,</p>
+          )}
+          <SortedScore />
+        </>
+      );
+    } else {
+      return <p>Your score: {`${score[0].score}`}</p>;
+    }
+  };
+
   return (
     <ResultContainer>
-      {props.playerNumber === 2 ? (
-        <ScoreContainer>
-          Winner is User{props.winner}!, score:{props.score[`${props.winner}`]}
-        </ScoreContainer>
-      ) : (
-        <ScoreContainer>Your score: {props.score["1"]} </ScoreContainer>
-      )}
+      <ScoreTable />
       <Button
         style={{ height: "30%" }}
         text="Play Again"

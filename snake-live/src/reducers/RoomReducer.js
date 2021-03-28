@@ -5,10 +5,7 @@ const INITIAL_STATE = {
   playerNumber: 0,
   gameActive: true,
   winner: "",
-  score: {
-    1: 0,
-    2: 0,
-  },
+  score: [{ 1: 0 }, { 2: 0 }],
 };
 
 export default (state = INITIAL_STATE, action) => {

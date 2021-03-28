@@ -84,7 +84,6 @@ const GameBoard = memo((props) => {
 
   const drawSnake = (playerState, size, colour) => {
     const snake = playerState.snake;
-
     context.fillStyle = colour;
     for (let cell of snake) {
       context.fillRect(cell.x * size, cell.y * size, size, size);

@@ -60,6 +60,7 @@ const Room = (props) => {
           text="Cancel"
           onClick={() => {
             history.push("");
+            socket.emit("cancelGame", true);
           }}
         />
       </BarContainer>

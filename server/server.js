@@ -6,11 +6,9 @@ const server = http.createServer(app);
 const { initGame, gameLoop, getDirection } = require("./game");
 const { makeid } = require("./utils");
 
-const FRAME_RATE = 20,
+const FRAME_RATE = 10,
   state = {},
   clientRooms = {};
-
-let duration, gameInterval;
 
 const io = require("socket.io")(server, {
   cors: {
@@ -20,39 +18,54 @@ const io = require("socket.io")(server, {
 });
 
 io.on("connection", (socket) => {
+  let duration,
+    gameInterval,
+    counter = 180;
   const setInitValues = (gameId) => {
     socket.join(gameId);
     socket.emit("init", state[gameId]);
+
     startGameInterval(gameId);
   };
 
-  const handleNewGame = () => {
-    let gameId = makeid(5);
+  const finishGame = (gameId) => {
+    if (state[gameId].playerNumber === 1) {
+      winner = 1;
+    } else {
+      let players = state[gameId].players;
+      if (players[0].score > players[1].score) {
+        winner = 1;
+      } else if (players[0].score < players[1].score) {
+        winner = 2;
+      } else if (players[0].score === players[1].score) {
+        winner = 3;
+      }
+    }
 
+    emitGameOver(gameId, state[gameId], winner);
+    stopGame(gameId);
+  };
+
+  const countDown = (gameId) => {
+    counter--;
+    if (counter == 0) {
+      finishGame(gameId);
+    }
+  };
+
+  const stopGame = (gameId) => {
+    state[gameId] = null;
+    clearInterval(gameInterval);
+    clearInterval(duration);
+  };
+
+  const handleNewGame = () => {
+    let gameId = makeid(10);
     clientRooms[socket.id] = gameId;
     socket.emit("gameCode", gameId); //for two
     state[gameId] = initGame();
     state[gameId].playerNumber = 1;
     setInitValues(gameId);
-    duration = setTimeout(() => {
-      if (state[gameId].playerNumber === 1) {
-        winner = 1;
-      } else {
-        let players = state[gameId].players;
-        if (players[0].score > players[1].score) {
-          winner = 1;
-        } else if (players[0].score < players[1].score) {
-          winner = 2;
-        } else if (players[0].score === players[1].score) {
-          winner = 3;
-        }
-      }
-
-      //repetitive code
-      emitGameOver(gameId, state[gameId], winner);
-      state[gameId] = null;
-      clearInterval(gameInterval);
-    }, 30000);
   };
 
   const handleKeydown = (keyCode) => {
@@ -79,24 +92,20 @@ io.on("connection", (socket) => {
       currentPlayer.axis = directionInfo.axis;
     }
   };
+  const startGameInterval = (gameId) => {
+    duration = setInterval(() => {
+      countDown(gameId);
+    }, 1000);
+    gameInterval = setInterval(() => {
+      gameLoop(state[gameId]);
+      emitGameState(gameId, state[gameId]);
+    }, 1000 / FRAME_RATE);
+    socket.on("cancelGame", stopGame);
+  };
+
   socket.on("keydown", handleKeydown);
   socket.on("newGame", handleNewGame);
 });
-
-const startGameInterval = (gameId) => {
-  gameInterval = setInterval(() => {
-    const winner = gameLoop(state[gameId]);
-
-    if (!winner) {
-      emitGameState(gameId, state[gameId]);
-    } else {
-      clearTimeout(duration);
-      emitGameOver(gameId, state[gameId], winner);
-      state[gameId] = null;
-      clearInterval(gameInterval);
-    }
-  }, 1000 / FRAME_RATE);
-};
 
 const emitGameState = (room, gameState) => {
   // Send this event to everyone in the room.

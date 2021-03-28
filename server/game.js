@@ -146,10 +146,15 @@ const randomSnake = (player) => {
   const newPos = { x: randomNumber(), y: randomNumber() };
   player.pos = newPos;
   player.snake = [
-    { x: newPos.x, y: newPos.y },
-    { x: newPos.x + 1, y: newPos.y },
-    { x: newPos.x + 2, y: newPos.y },
+    { x: newPos.x - 3, y: newPos.y },
+    { x: newPos.x - 2, y: newPos.y },
+    { x: newPos.x - 1, y: newPos.y },
   ];
+  player.vel = {
+    x: 1,
+    y: 0,
+  };
+  player.axis = "horizontal";
 };
 
 const randomFood = (state) => {

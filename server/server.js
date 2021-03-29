@@ -2,10 +2,10 @@ const http = require("http");
 const express = require("express");
 const app = express();
 const server = http.createServer(app);
-
+const cors = require("cors");
 const { initGame, gameLoop, getDirection } = require("./game");
 const { makeid } = require("./utils");
-
+app.use(cors());
 const FRAME_RATE = 20,
   state = {},
   clientRooms = {};
@@ -20,57 +20,75 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
   let duration,
     gameInterval,
-    counter = 5;
-  const setInitValues = (gameId) => {
-    socket.join(gameId);
-    socket.emit("init", state[gameId]);
-
-    startGameInterval(gameId);
-  };
+    counter = 180;
 
   const finishGame = (gameId) => {
-    if (state[gameId].playerNumber === 1) {
-      winner = 1;
-    } else {
-      let players = state[gameId].players;
-      if (players[0].score > players[1].score) {
-        winner = 1;
-      } else if (players[0].score < players[1].score) {
-        winner = 2;
-      } else if (players[0].score === players[1].score) {
-        winner = 3;
-      }
-    }
-
-    emitGameOver(gameId, state[gameId], winner);
+    emitGameOver(gameId, state[gameId]);
     stopGame(gameId);
   };
 
   const countDown = (gameId) => {
     counter--;
-    socket.emit("timer", counter);
+    io.to(gameId).emit("timer", counter);
     if (counter == 0) {
       finishGame(gameId);
     }
   };
 
+  const startGame = (gameId) => {
+    socket.join(gameId);
+    socket.emit("start", state[gameId]);
+    startGameInterval(gameId);
+  };
+
   const stopGame = (gameId) => {
     state[gameId] = null;
-    counter = 5;
+    counter = 180;
     clearInterval(gameInterval);
     clearInterval(duration);
+  };
+
+  const handleJoinGame = (gameId) => {
+    const room = io.sockets.adapter.rooms.get(gameId);
+    let allUsers;
+    if (room) {
+      allUsers = room.size;
+    }
+    if (allUsers === 0) {
+      socket.emit("unknownCode");
+      return;
+    } else if (allUsers > 1) {
+      socket.emit("tooManyPlayers");
+      return;
+    } else {
+      socket.join(gameId);
+
+      io.to(gameId).emit("joined", state[gameId]);
+      clientRooms[socket.id] = gameId;
+
+      startGameInterval(gameId);
+    }
+  };
+
+  const createTwoPlayerGame = () => {
+    let gameId = makeid(10);
+    socket.emit("gameUrl", `http://localhost:3000/${gameId}`);
+    clientRooms[socket.id] = gameId;
+    state[gameId] = initGame();
+    state[gameId].playerNumber = 2;
+    socket.join(gameId);
   };
 
   const createSingleGame = () => {
     let gameId = makeid(10);
     clientRooms[socket.id] = gameId;
-    socket.emit("gameCode", gameId); //for two
     state[gameId] = initGame();
     state[gameId].playerNumber = 1;
-    setInitValues(gameId);
+
+    startGame(gameId);
   };
 
-  const handleKeydown = (keyCode) => {
+  const handleKeydown = ({ keyCode, userId }) => {
     const gameId = clientRooms[socket.id];
     if (!gameId) {
       return;
@@ -81,9 +99,8 @@ io.on("connection", (socket) => {
       console.error(e);
       return;
     }
-    const currentPlayer =
-      state[gameId] && state[gameId].players[state[gameId].playerNumber - 1];
 
+    const currentPlayer = state[gameId] && state[gameId].players[userId - 1];
     const directionInfo = getDirection(keyCode);
     if (
       currentPlayer &&
@@ -102,21 +119,26 @@ io.on("connection", (socket) => {
       gameLoop(state[gameId]);
       emitGameState(gameId, state[gameId]);
     }, 1000 / FRAME_RATE);
-    socket.on("cancelGame", stopGame);
+    io.sockets.on("cancelGame", stopGame);
   };
 
+  const playAgain = () => {};
+
   socket.on("keydown", handleKeydown);
-  socket.on("newGame", createSingleGame);
+  socket.on("newSingleGame", createSingleGame);
+  socket.on("newTwoPlayerGame", createTwoPlayerGame);
+  socket.on("secondJoined", handleJoinGame);
+  socket.on("playAgain", playAgain);
+
+  const emitGameState = (gameId, gameState) => {
+    // Send this event to everyone in the room.
+    io.to(gameId).emit("gameState", JSON.stringify(gameState));
+  };
+
+  const emitGameOver = (gameId, gameState) => {
+    io.to(gameId).emit("gameOver", JSON.stringify({ gameState }));
+  };
 });
-
-const emitGameState = (room, gameState) => {
-  // Send this event to everyone in the room.
-  io.sockets.in(room).emit("gameState", JSON.stringify(gameState));
-};
-
-const emitGameOver = (room, gameState, winner) => {
-  io.sockets.in(room).emit("gameOver", JSON.stringify({ gameState, winner }));
-};
 
 server.on("error", (err) => {
   console.error(err);

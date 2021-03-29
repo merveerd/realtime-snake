@@ -1,10 +1,10 @@
-import React, { useContext, useState } from "react";
-import { connect } from "react-redux";
+import React, { useContext, useState, useEffect } from "react";
+import { connect, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Button, Input } from "../components";
 import { SocketContext } from "../socketClient";
-import { changeGameStatus, setRoomInfo } from "../actions";
+import { changeGameStatus, setRoomInfo, setUserId } from "../actions";
 import { font, bg } from "../style/sharedStyle";
 
 const MainContainer = styled.div`
@@ -28,45 +28,58 @@ const NewGameContainer = styled.div`
 const Main = (props) => {
   const history = useHistory();
   const socket = useContext(SocketContext);
-  const [openInput, setOpenInput] = useState(null);
-  const [gameCode, setGameCode] = useState(null);
+  const [inviteUrl, setInviteUrl] = useState(null);
 
-  const newGame = () => {
-    props.changeGameStatus({ gameActive: true });
-    socket.emit("newGame");
-    socket.on("init", handleInit);
-    history.push("room");
-  };
-
-  const handleInit = (state) => {
+  const startGame = (state) => {
+    setInviteUrl(null);
     props.setRoomInfo({
+      gameId: state.gameId,
       playerNumber: state.playerNumber,
       gridNumber: state.gridNumber,
-    }); //any other info too
+    });
+    props.changeGameStatus({ gameActive: true, roomActive: true });
+    history.push(`${state.gameId}`);
   };
 
-  const enterCode = () => {
-    setOpenInput(true);
+  useEffect(() => {
+    socket.on("joined", startGame);
+
+    return () => {
+      socket.off("joined", startGame);
+      socket.off("gameUrl", showInviteUrl);
+      socket.off("start", startGame);
+    };
+  }, []);
+
+  const showInviteUrl = (url) => {
+    setInviteUrl(url);
   };
+
+  const newSingleGame = () => {
+    socket.emit("newSingleGame");
+    socket.on("start", startGame);
+    props.setUserId(1);
+  };
+
+  const newTwoPlayerGame = () => {
+    socket.emit("newTwoPlayerGame");
+    socket.on("gameUrl", showInviteUrl);
+    props.setUserId(1);
+  };
+
   return (
     <MainContainer>
       <NewGameContainer>
-        <Button text=" Single Player" onClick={newGame} />
-        <Button text="Two Player" onClick={newGame} />
+        <Button text=" Single Player" onClick={newSingleGame} />
+        <Button text="Two Player" onClick={newTwoPlayerGame} />
       </NewGameContainer>
-
-      {openInput ? (
-        <h1>
-          Enter Code : <Input placeholder="Code"></Input>
-        </h1>
-      ) : (
-        <Button text="Join Game" onClick={enterCode}></Button>
+      {}
+      {inviteUrl && (
+        <h3>
+          Invite Link: {inviteUrl}
+          <br></br>Waiting for the second player
+        </h3>
       )}
-      {/* {gameCode && ( //in Two Player Game
-        <h1>
-          Game code to join: <GameCodeDisplay>{gameCode}</GameCodeDisplay>
-        </h1>
-      )} */}
     </MainContainer>
   );
 };
@@ -74,12 +87,14 @@ const Main = (props) => {
 const mapDispatchToProps = {
   changeGameStatus,
   setRoomInfo,
+  setUserId,
 };
 const mapStateToProps = ({ roomResponse }) => {
-  const { gameActive } = roomResponse;
+  const { gameActive, playerNumber } = roomResponse;
 
   return {
     gameActive,
+    playerNumber,
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

@@ -1,8 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Route, Switch, useParams } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import Main from "./pages/Main";
 import Room from "./pages/Room";
+import Join from "./pages/Join";
 const ROUTES = [
   {
     path: "/",
@@ -18,10 +19,10 @@ const ROUTES = [
         component: Main,
       },
       {
-        path: "/room",
-        key: "APP_ROOM",
+        path: "/:gameId",
+        key: "APP_GAME",
         exact: true,
-        component: Room,
+        component: Join,
       },
     ],
   },
@@ -29,17 +30,6 @@ const ROUTES = [
 
 export default ROUTES;
 
-function GameArea() {
-  // We can use the `useParams` hook here to access
-  // the dynamic pieces of the URL.
-  let { id } = useParams();
-
-  return (
-    <div>
-      <h3>game id {id}</h3>
-    </div>
-  );
-}
 const RouteWithSubRoutes = (route) => {
   return (
     <Route

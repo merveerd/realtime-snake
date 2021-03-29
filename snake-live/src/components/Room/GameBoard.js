@@ -4,7 +4,7 @@ import { SocketContext } from "../../socketClient";
 
 const GameBoard = memo((props) => {
   const room = useSelector((state) => state.roomResponse);
-  const { playerNumber, gridNumber, gameActive } = room;
+  const { playerNumber, gridNumber, gameActive, userId } = room;
 
   const canvasRef = useRef(null);
   const socket = useContext(SocketContext);
@@ -30,7 +30,7 @@ const GameBoard = memo((props) => {
     if (gameActive) {
       const keyDown = (e) => {
         if (gameActive) {
-          socket.emit("keydown", e.keyCode);
+          socket.emit("keydown", { keyCode: e.keyCode, userId });
         }
       };
 
@@ -64,7 +64,7 @@ const GameBoard = memo((props) => {
     drawGrid();
     drawSnake(state.players[0], size, "#a060d1");
 
-    playerNumber === 2 && drawSnake(state.players[1], size, "red");
+    playerNumber === 2 && drawSnake(state.players[1], size, "white");
   };
 
   const drawGrid = () => {

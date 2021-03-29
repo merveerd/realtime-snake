@@ -1,10 +1,17 @@
-import { SET_ROOM_INFO, SET_SCORE, CHANGE_GAME_STATUS } from "../actions/types";
+import {
+  SET_USER_ID,
+  SET_ROOM_INFO,
+  SET_SCORE,
+  CHANGE_GAME_STATUS,
+} from "../actions/types";
 
 const INITIAL_STATE = {
+  gameId: "",
   gridNumber: "",
   playerNumber: 0,
-  gameActive: true,
-  winner: "",
+  userId: "",
+  gameActive: false,
+  roomActive: false,
   score: [{ 1: 0 }, { 2: 0 }],
 };
 
@@ -13,18 +20,23 @@ export default (state = INITIAL_STATE, action) => {
     case SET_ROOM_INFO: {
       const gridNumber = action.payload.gridNumber;
       const playerNumber = action.payload.playerNumber;
-      return { ...state, playerNumber, gridNumber };
+      const gameId = action.payload.gameId;
+      return { ...state, playerNumber, gridNumber, gameId };
     }
 
     case SET_SCORE: {
       const score = action.payload;
       return { ...state, score };
     }
+    case SET_USER_ID: {
+      const userId = action.payload;
+      return { ...state, userId };
+    }
 
     case CHANGE_GAME_STATUS: {
       const gameActive = action.payload.gameActive;
-      const winner = action.payload.winner;
-      return { ...state, gameActive: gameActive, winner };
+      const roomActive = action.payload.roomActive;
+      return { ...state, gameActive, roomActive };
     }
 
     default:

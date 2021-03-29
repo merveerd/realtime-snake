@@ -23,7 +23,7 @@ export const fontSize = {
     font-size: 2rem;
   `,
   lrg: css`
-    font-size: 3rem;
+    font-size: 2.4rem;
   `,
 };
 

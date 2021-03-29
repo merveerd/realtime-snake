@@ -1,11 +1,11 @@
 import React, { memo, useRef, useContext, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { SocketContext } from "../../socketClient";
-
+import { setScore } from "../../actions";
 const GameBoard = memo((props) => {
   const room = useSelector((state) => state.roomResponse);
   const { playerNumber, gridNumber, gameActive, userId } = room;
-
+  const dispatch = useDispatch();
   const canvasRef = useRef(null);
   const socket = useContext(SocketContext);
 
@@ -43,10 +43,12 @@ const GameBoard = memo((props) => {
 
   const handleGameState = (state) => {
     state = JSON.parse(state);
-    props.setScore([
-      { score: state.players[0].score, userName: 1 },
-      { score: state.players[1].score, userName: 2 },
-    ]);
+    dispatch(
+      setScore([
+        { score: state.players[0].score, userName: 1 },
+        { score: state.players[1].score, userName: 2 },
+      ])
+    );
 
     requestAnimationFrame(() => paintGame(state));
   };

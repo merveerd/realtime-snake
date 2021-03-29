@@ -23,8 +23,8 @@ io.on("connection", (socket) => {
     gameInterval,
     counter = 18;
   allClients.push(socket);
-  const stopGame = (gameId) => {
-    state[gameId] = null;
+
+  const stopGame = () => {
     counter = 18;
     clearInterval(gameInterval);
     clearInterval(duration);
@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
   const finishGame = (gameId) => {
     let gameState = state[gameId];
     io.to(gameId).emit("timeOver", JSON.stringify({ gameState }));
-    stopGame(gameId);
+    stopGame();
   };
 
   const countDown = (gameId) => {
@@ -44,15 +44,10 @@ io.on("connection", (socket) => {
     }
   };
 
-  const startGame = (gameId) => {
-    socket.join(gameId);
-    socket.emit("start", state[gameId]);
-    startGameInterval(gameId);
-  };
-
   const cancelGame = (gameId) => {
+    state[gameId] = null;
     io.to(gameId).emit("canceled", counter);
-    stopGame(gameId);
+    stopGame();
   };
 
   const handleJoinGame = (gameId) => {
@@ -68,10 +63,9 @@ io.on("connection", (socket) => {
       socket.emit("tooManyPlayers");
       return;
     } else {
-      socket.join(gameId);
-
-      io.to(gameId).emit("joined", state[gameId]);
       clientRooms[socket.id] = gameId;
+      socket.join(gameId);
+      io.to(gameId).emit("joined", state[gameId]);
 
       startGameInterval(gameId);
     }
@@ -93,7 +87,10 @@ io.on("connection", (socket) => {
     state[gameId] = initGame();
     state[gameId].playerNumber = 1;
     state[gameId].gameId = gameId;
-    startGame(gameId);
+    socket.join(gameId);
+    socket.emit("start", state[gameId]);
+
+    startGameInterval(gameId);
   };
 
   const handleKeydown = ({ keyCode, userId }) => {
@@ -124,14 +121,24 @@ io.on("connection", (socket) => {
     duration = setInterval(() => {
       countDown(gameId);
     }, 1000);
+
     gameInterval = setInterval(() => {
       gameLoop(state[gameId]);
       emitGameState(gameId, state[gameId]);
     }, 1000 / FRAME_RATE);
   };
 
-  const playAgain = () => {
-    //state
+  const playAgain = (gameId) => {
+    const currentPlayerNumber = state[gameId].playerNumber;
+    state[gameId] = initGame();
+    state[gameId].playerNumber = currentPlayerNumber;
+    state[gameId].gameId = gameId;
+
+    currentPlayerNumber === 2
+      ? io.to(gameId).emit("joined", state[gameId])
+      : socket.emit("start", state[gameId]);
+
+    startGameInterval(gameId);
   };
 
   socket.on("disconnect", () => {

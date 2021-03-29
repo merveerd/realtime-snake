@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { Button } from "../components";
 import { SocketContext } from "../socketClient";
-import { changeGameStatus, setUserId, setRoomInfo } from "../actions";
+import { setUserId, changeGameStatus } from "../actions";
 import { font, bg } from "../style/sharedStyle";
 import Room from "./Room";
 
@@ -22,36 +22,11 @@ const Join = (props) => {
   const index = window.location.href.lastIndexOf("/");
   const gameId = window.location.href.substr(index + 1); //getting gameId from Url
   const roomActive = useSelector((state) => state.roomResponse.roomActive);
-
-  const socket = useContext(SocketContext);
-  useEffect(() => {
-    socket.on("joined", startGame);
-    return () => {
-      socket.off("joined", startGame);
-    };
-  }, []);
-
-  const startGame = (state) => {
-    // history.push("room");
-
-    dispatch(
-      setRoomInfo({
-        gameId: state.gameId,
-        playerNumber: state.playerNumber,
-        gridNumber: state.gridNumber,
-      })
-    );
-    dispatch(
-      changeGameStatus({
-        gameActive: true,
-        roomActive: true,
-      })
-    );
-  };
-
   const dispatch = useDispatch();
+  const socket = useContext(SocketContext);
 
   const JoinGame = () => {
+    dispatch(changeGameStatus({ gameActive: true, roomActive: true }));
     dispatch(setUserId(2));
     socket.emit("secondJoined", gameId);
   };

@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
-import { connect, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { Button, Input } from "../components";
+import { Button } from "../components";
 import { SocketContext } from "../socketClient";
 import { changeGameStatus, setRoomInfo, setUserId } from "../actions";
 import { font, bg } from "../style/sharedStyle";
@@ -27,23 +27,32 @@ const NewGameContainer = styled.div`
 
 const Main = (props) => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const socket = useContext(SocketContext);
+
   const [inviteUrl, setInviteUrl] = useState(null);
 
   const startGame = (state) => {
     setInviteUrl(null);
-    props.setRoomInfo({
-      gameId: state.gameId,
-      playerNumber: state.playerNumber,
-      gridNumber: state.gridNumber,
-    });
-    props.changeGameStatus({ gameActive: true, roomActive: true });
+    dispatch(
+      setRoomInfo({
+        gameId: state.gameId,
+        playerNumber: state.playerNumber,
+        gridNumber: state.gridNumber,
+      })
+    );
+    dispatch(
+      changeGameStatus({
+        gameActive: true,
+        roomActive: true,
+      })
+    );
     history.push(`${state.gameId}`);
   };
 
   useEffect(() => {
     socket.on("joined", startGame);
-
+    socket.on("start", startGame);
     return () => {
       socket.off("joined", startGame);
       socket.off("gameUrl", showInviteUrl);
@@ -57,14 +66,15 @@ const Main = (props) => {
 
   const newSingleGame = () => {
     socket.emit("newSingleGame");
+
     socket.on("start", startGame);
-    props.setUserId(1);
+    dispatch(setUserId(1));
   };
 
   const newTwoPlayerGame = () => {
     socket.emit("newTwoPlayerGame");
     socket.on("gameUrl", showInviteUrl);
-    props.setUserId(1);
+    dispatch(setUserId(1));
   };
 
   return (
@@ -84,17 +94,4 @@ const Main = (props) => {
   );
 };
 
-const mapDispatchToProps = {
-  changeGameStatus,
-  setRoomInfo,
-  setUserId,
-};
-const mapStateToProps = ({ roomResponse }) => {
-  const { gameActive, playerNumber } = roomResponse;
-
-  return {
-    gameActive,
-    playerNumber,
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default Main;

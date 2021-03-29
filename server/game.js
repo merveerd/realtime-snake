@@ -1,7 +1,11 @@
+//encapsulate here
 const GRID_NUMBER = 80;
+let bonusScoreCounter,
+  bonusRandomizer = Math.ceil(Math.random() * 2 + 2);
 
 const initGame = () => {
   const state = createGameState();
+  bonusScoreCounter = 0;
   randomFood(state);
   return state;
 };
@@ -71,7 +75,13 @@ const gameLoop = (state) => {
 
     if (state.food.x === player.pos.x && state.food.y === player.pos.y) {
       player.snake.push({ ...player.pos });
-      player.score += 100;
+      if (state.food.bonus) {
+        player.score += 200;
+        bonusRandomizer = Math.ceil(Math.random() * 2 + 2);
+        state.food.bonus = false;
+      } else {
+        player.score += 100;
+      }
       player.pos.x += player.vel.x;
       player.pos.y += player.vel.y;
       randomFood(state);
@@ -117,10 +127,15 @@ const randomSnake = (player) => {
 };
 
 const randomFood = (state) => {
-  food = {
+  bonusScoreCounter++;
+
+  let food = {
     x: Math.floor(Math.random() * GRID_NUMBER),
     y: Math.floor(Math.random() * GRID_NUMBER),
   };
+  if (bonusScoreCounter % bonusRandomizer === 0) {
+    food.bonus = true;
+  }
 
   for (let cell of state.players[0].snake) {
     if (cell.x === food.x && cell.y === food.y) {

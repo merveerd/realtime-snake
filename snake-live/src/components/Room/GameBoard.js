@@ -60,7 +60,9 @@ const GameBoard = memo((props) => {
     context.fillStyle = "#e88574"; //board
     context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-    context.fillStyle = "#34e1eb"; //food
+    food.bonus
+      ? (context.fillStyle = "#ebe834")
+      : (context.fillStyle = "#34e1eb"); //food
     context.fillRect(food.x * size, food.y * size, size, size);
 
     drawGrid();

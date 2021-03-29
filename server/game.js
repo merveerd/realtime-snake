@@ -35,12 +35,12 @@ const createGameState = () => {
         axis: "",
         vel: {
           x: 0,
-          y: 0,
+          y: 1,
         },
         snake: [
+          { x: 10, y: 8 },
+          { x: 10, y: 9 },
           { x: 10, y: 10 },
-          { x: 9, y: 10 },
-          { x: 8, y: 10 },
         ],
         score: 0,
       },
@@ -55,92 +55,51 @@ const gameLoop = (state) => {
     return;
   }
 
-  //handle this in one function
-  // gameState.players.forEach((player) => {});
-  const playerOne = state.players[0];
-  const playerTwo = state.players[1];
+  state.players.forEach((player, index) => {
+    player.pos.x += player.vel.x;
+    player.pos.y += player.vel.y;
 
-  playerOne.pos.x += playerOne.vel.x;
-  playerOne.pos.y += playerOne.vel.y;
-
-  playerTwo.pos.x += playerTwo.vel.x;
-  playerTwo.pos.y += playerTwo.vel.y;
-
-  if (
-    playerOne.pos.x < 0 ||
-    playerOne.pos.x > GRID_NUMBER ||
-    playerOne.pos.y < 0 ||
-    playerOne.pos.y > GRID_NUMBER
-  ) {
-    randomSnake(playerOne);
-    playerOne.score = 0;
-  }
-
-  if (
-    playerTwo.pos.x < 0 ||
-    playerTwo.pos.x > GRID_NUMBER ||
-    playerTwo.pos.y < 0 ||
-    playerTwo.pos.y > GRID_NUMBER
-  ) {
-    randomSnake(playerTwo);
-    playerTwo.score = 0;
-  }
-
-  if (state.food.x === playerOne.pos.x && state.food.y === playerOne.pos.y) {
-    playerOne.snake.push({ ...playerOne.pos });
-    playerOne.score += 100;
-    playerOne.pos.x += playerOne.vel.x;
-    playerOne.pos.y += playerOne.vel.y;
-    randomFood(state);
-  }
-
-  if (state.food.x === playerTwo.pos.x && state.food.y === playerTwo.pos.y) {
-    playerTwo.snake.push({ ...playerTwo.pos });
-    playerTwo.score += 100;
-    playerTwo.pos.x += playerTwo.vel.x;
-    playerTwo.pos.y += playerTwo.vel.y;
-    randomFood(state);
-  }
-
-  if (playerOne.vel.x || playerOne.vel.y) {
-    for (let cell of playerOne.snake) {
-      if (
-        (cell.x === playerOne.pos.x && cell.y === playerOne.pos.y) ||
-        ((playerTwo.vel.x || playerTwo.vel.y) &&
-          cell.x === playerTwo.pos.x &&
-          cell.y === playerTwo.pos.y)
-      ) {
-        randomSnake(playerOne);
-        playerOne.score = 0;
-      }
+    if (
+      player.pos.x < 0 ||
+      player.pos.x > GRID_NUMBER ||
+      player.pos.y < 0 ||
+      player.pos.y > GRID_NUMBER
+    ) {
+      randomSnake(player);
+      player.score = 0;
     }
 
-    playerOne.snake.push({ ...playerOne.pos });
-    playerOne.snake.shift();
-  }
-
-  if (playerTwo.vel.x || playerTwo.vel.y) {
-    for (let cell of playerTwo.snake) {
-      if (
-        (cell.x === playerTwo.pos.x && cell.y === playerTwo.pos.y) ||
-        ((playerOne.vel.x || playerOne.vel.y) &&
-          cell.x === playerOne.pos.x &&
-          cell.y === playerOne.pos.y)
-      ) {
-        randomSnake(playerTwo);
-        playerTwo.score = 0;
-      }
+    if (state.food.x === player.pos.x && state.food.y === player.pos.y) {
+      player.snake.push({ ...player.pos });
+      player.score += 100;
+      player.pos.x += player.vel.x;
+      player.pos.y += player.vel.y;
+      randomFood(state);
     }
+    const otherPlayer = index === 0 ? state.players[1] : state.players[0];
 
-    playerTwo.snake.push({ ...playerTwo.pos });
-    playerTwo.snake.shift();
-  }
+    if (player.vel.x || player.vel.y) {
+      for (let cell of player.snake) {
+        if (
+          (cell.x === player.pos.x && cell.y === player.pos.y) ||
+          ((otherPlayer.vel.x || otherPlayer.vel.y) && //random die
+            cell.x === otherPlayer.pos.x &&
+            cell.y === otherPlayer.pos.y)
+        ) {
+          randomSnake(player);
+          player.score = 0;
+        }
+      }
 
+      player.snake.push({ ...player.pos });
+      player.snake.shift();
+    }
+  });
   return false;
 };
 
 const randomNumber = () => {
-  return Math.floor(Math.random() * (GRID_NUMBER - 20));
+  return Math.floor(Math.random() * (GRID_NUMBER - 20)); //20 is buffer
 };
 const randomSnake = (player) => {
   const newPos = { x: randomNumber(), y: randomNumber() };
@@ -181,16 +140,20 @@ const randomFood = (state) => {
 const getDirection = (keyCode) => {
   switch (keyCode) {
     case 37: {
-      return { x: -1, y: 0, direction: "left", axis: "horizontal" };
+      //left
+      return { x: -1, y: 0, axis: "horizontal" };
     }
     case 38: {
-      return { x: 0, y: -1, direction: "down", axis: "vertical" };
+      //down
+      return { x: 0, y: -1, axis: "vertical" };
     }
     case 39: {
-      return { x: 1, y: 0, direction: "right", axis: "horizontal" };
+      //right
+      return { x: 1, y: 0, axis: "horizontal" };
     }
     case 40: {
-      return { x: 0, y: 1, direction: "up", axis: "vertical" };
+      //up
+      return { x: 0, y: 1, axis: "vertical" };
     }
   }
 };

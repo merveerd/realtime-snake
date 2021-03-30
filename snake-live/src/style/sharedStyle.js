@@ -7,9 +7,7 @@ export const font = {
   lightPurple: css`
     color: #a060d1;
   `,
-  darkGray: css`
-    color: ##1e1f1e;
-  `,
+
   pinky: css`
     color: #f7947c;
   `,
@@ -34,13 +32,13 @@ export const bg = {
   lightPurple: css`
     background-color: #a060d1;
   `,
-  darkGray: css`
-    background-color: ##1e1f1e;
-  `,
   pinky: css`
     background-color: #f7947c;
   `,
   blue: css`
     background-color: #34e1eb;
+  `,
+  whitesmoke: css`
+    background-color: whitesmoke;
   `,
 };

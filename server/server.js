@@ -62,12 +62,14 @@ io.on("connection", (socket) => {
     const room = io.sockets.adapter.rooms.get(gameId);
     let allUsers;
     if (room) {
+      console.log(room, room.size);
       allUsers = room.size;
     }
-    if (allUsers === 0) {
+    if (!allUsers) {
       socket.emit("unknownCode");
       return;
     } else if (allUsers > 1) {
+      console.log("tooManyPlayers");
       socket.emit("tooManyPlayers");
       return;
     } else {
@@ -180,7 +182,6 @@ io.on("connection", (socket) => {
     startGameInterval(gameId);
   });
   const emitGameState = (gameId, gameState) => {
-    //f  console.log("emit", gameState.playerNumber);
     io.to(gameId).emit("gameState", JSON.stringify(gameState));
   };
 });

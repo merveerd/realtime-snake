@@ -9,10 +9,11 @@ import { bg } from "../style/sharedStyle";
 const RoomContainer = styled.div`
   width: 100%;
   display: flex;
+  background-color: whitesmoke;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  ${bg.darkGray};
+  ${bg.whitesmoke};
 `;
 
 const Room = (props) => {
@@ -66,7 +67,9 @@ const Room = (props) => {
     socket.on("tooManyPlayers", () => {
       history.push("");
     });
-
+    socket.on("unknownCode", () => {
+      history.push("");
+    });
     return () => {
       socket.off("timeOver", handleTimeOver);
       socket.off("timer", setTimer);
@@ -74,6 +77,9 @@ const Room = (props) => {
       socket.off("start", startGame);
       socket.off("canceled", handleCancel);
       socket.off("tooManyPlayers", () => {
+        history.push("");
+      });
+      socket.off("unknownCode", () => {
         history.push("");
       });
     };

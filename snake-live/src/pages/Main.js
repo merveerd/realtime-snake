@@ -31,7 +31,7 @@ const Main = (props) => {
   const socket = useContext(SocketContext);
 
   const [inviteUrl, setInviteUrl] = useState(null);
-
+  const [copySuccess, setCopySuccess] = useState("");
   const startGame = (state) => {
     setInviteUrl(null);
     if (state) {
@@ -81,6 +81,21 @@ const Main = (props) => {
     dispatch(setUserId(1));
   };
 
+  const copyToClipBoard = async (e) => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      e.target.focus();
+      setCopySuccess("Copied!");
+      setTimeout(() => {
+        setCopySuccess("");
+      }, 1000);
+      //
+    } catch (err) {
+      setCopySuccess("Couldn't copied!");
+      console.log(err);
+    }
+  };
+
   return (
     <MainContainer>
       <NewGameContainer>
@@ -89,11 +104,12 @@ const Main = (props) => {
       </NewGameContainer>
       {}
       {inviteUrl && (
-        <h3>
-          Invite Link: {inviteUrl}
+        <h3 style={{ cursor: "pointer" }} onClick={copyToClipBoard}>
+          Invite Link, click to copy: {inviteUrl}
           <br></br>Waiting for the second player
         </h3>
       )}
+      {copySuccess}
     </MainContainer>
   );
 };

@@ -13,6 +13,7 @@ const initGame = () => {
 const createGameState = () => {
   return {
     playerNumber: 0,
+    lastPlayedPlayer: 0,
     players: [
       {
         pos: {
@@ -94,7 +95,8 @@ const gameLoop = (state) => {
           (cell.x === player.pos.x && cell.y === player.pos.y) ||
           ((otherPlayer.vel.x || otherPlayer.vel.y) && //random die
             cell.x === otherPlayer.pos.x &&
-            cell.y === otherPlayer.pos.y)
+            cell.y === otherPlayer.pos.y &&
+            state.lastPlayedPlayer === index + 1) //index+1 is equal to id in this game
         ) {
           randomSnake(player);
           player.score = 0;

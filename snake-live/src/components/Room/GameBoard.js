@@ -43,6 +43,7 @@ const GameBoard = memo((props) => {
 
   const handleGameState = (state) => {
     state = JSON.parse(state);
+
     dispatch(
       setScore([
         { score: state.players[0].score, userName: 1 },

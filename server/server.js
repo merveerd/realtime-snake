@@ -5,6 +5,7 @@ const server = http.createServer(app);
 const cors = require("cors");
 const { initGame, gameLoop, getDirection } = require("./game");
 const { makeid } = require("./utils");
+
 app.use(cors());
 const FRAME_RATE = 20,
   state = {},
@@ -19,15 +20,13 @@ const io = require("socket.io")(server, {
 });
 
 io.on("connection", (socket) => {
-  let duration,
-    gameInterval,
+  let gameInterval,
     counter = 18;
   allClients.push(socket);
 
   const stopGame = () => {
     counter = 18;
     clearInterval(gameInterval);
-    clearInterval(duration);
   };
 
   const finishGame = (gameId) => {
@@ -47,6 +46,10 @@ io.on("connection", (socket) => {
   const cancelGame = (gameId) => {
     state[gameId] = null;
     io.to(gameId).emit("canceled", counter);
+    stopGame();
+  };
+
+  const pauseGame = (gameId) => {
     stopGame();
   };
 
@@ -114,31 +117,36 @@ io.on("connection", (socket) => {
     ) {
       currentPlayer.vel = { x: directionInfo.x, y: directionInfo.y };
       currentPlayer.axis = directionInfo.axis;
+      state[gameId].lastPlayedPlayer = userId;
     }
   };
 
   const startGameInterval = (gameId) => {
-    duration = setInterval(() => {
-      countDown(gameId);
-    }, 1000);
-
+    let gameCounter = 0;
     gameInterval = setInterval(() => {
+      gameCounter++;
+      if (gameCounter % FRAME_RATE === 0) {
+        countDown(gameId);
+      }
       gameLoop(state[gameId]);
       emitGameState(gameId, state[gameId]);
     }, 1000 / FRAME_RATE);
   };
 
   const playAgain = (gameId) => {
-    const currentPlayerNumber = state[gameId].playerNumber;
-    state[gameId] = initGame();
-    state[gameId].playerNumber = currentPlayerNumber;
-    state[gameId].gameId = gameId;
+    if (state[gameId]) {
+      const currentPlayerNumber = state[gameId].playerNumber;
 
-    currentPlayerNumber === 2
-      ? io.to(gameId).emit("joined", state[gameId])
-      : socket.emit("start", state[gameId]);
+      state[gameId] = initGame();
+      state[gameId].gameId = gameId;
+      state[gameId].playerNumber = currentPlayerNumber;
 
-    startGameInterval(gameId);
+      currentPlayerNumber === 2
+        ? io.to(gameId).emit("joined", state[gameId])
+        : socket.emit("start", state[gameId]);
+
+      startGameInterval(gameId);
+    }
   };
 
   socket.on("disconnect", () => {
@@ -151,8 +159,14 @@ io.on("connection", (socket) => {
   socket.on("secondJoined", handleJoinGame);
   socket.on("playAgain", playAgain);
   socket.on("cancelGame", cancelGame);
+  socket.on("pauseGame", (gameId) => {
+    clearInterval(gameInterval);
+    io.to(gameId).emit("paused", counter);
+  });
+  socket.on("restartGame", (gameId) => {
+    startGameInterval(gameId);
+  });
   const emitGameState = (gameId, gameState) => {
-    // Send this event to everyone in the room.
     io.to(gameId).emit("gameState", JSON.stringify(gameState));
   };
 });

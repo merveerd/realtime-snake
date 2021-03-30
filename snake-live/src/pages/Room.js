@@ -32,19 +32,24 @@ const Room = (props) => {
   };
 
   const startGame = (state) => {
-    dispatch(
-      setRoomInfo({
-        gameId: state.gameId,
-        playerNumber: state.playerNumber,
-        gridNumber: state.gridNumber,
-      })
-    );
-    dispatch(
-      changeGameStatus({
-        gameActive: true,
-        roomActive: true,
-      })
-    );
+    if (state) {
+      setTime(180);
+      dispatch(
+        setRoomInfo({
+          gameId: state.gameId,
+          playerNumber: state.playerNumber,
+          gridNumber: state.gridNumber,
+        })
+      );
+      dispatch(
+        changeGameStatus({
+          gameActive: true,
+          roomActive: true,
+        })
+      );
+    } else {
+      history.push(""); //non valid url pop up for that
+    }
   };
 
   const handleCancel = (counter) => {
@@ -74,10 +79,21 @@ const Room = (props) => {
   const cancelGame = () => {
     socket.emit("cancelGame", gameId);
   };
+  const pauseGame = () => {
+    socket.emit("pauseGame", gameId);
+  };
 
+  const restartGame = () => {
+    socket.emit("restartGame", gameId);
+  };
   return (
     <RoomContainer>
-      <Bar cancelGame={cancelGame} remainedTime={time}></Bar>
+      <Bar
+        restartGame={restartGame}
+        cancelGame={cancelGame}
+        pauseGame={pauseGame}
+        remainedTime={time}
+      ></Bar>
       <GameBoard setScore={setScore} />
 
       {!gameActive && <Result playAgain={playAgain}></Result>}

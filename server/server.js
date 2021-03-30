@@ -13,7 +13,7 @@ const FRAME_RATE = 20,
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://6063491aae4fe01154fcce5d--snake-realtime.netlify.app",
     methods: ["GET", "POST"],
   },
 });

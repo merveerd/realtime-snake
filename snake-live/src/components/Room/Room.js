@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { SocketContext } from "../socketClient";
-import { Bar, GameBoard, Result } from "../components";
-import { changeGameStatus, setScore, setRoomInfo } from "../actions";
-import { bg } from "../style/sharedStyle";
-import { Container } from "../components/StyledContainer";
+import { SocketContext } from "../../socketClient";
+import { Bar, GameBoard, Result } from "..";
+import { changeGameStatus, setScore, setRoomInfo } from "../../actions";
+import { bg } from "../../style/sharedStyle";
+import { Container } from "../StyledContainer";
 
 const RoomContainer = styled(Container)`
   flex-direction: column;
@@ -108,6 +109,11 @@ const Room = (props) => {
       {!gameActive && <Result playAgain={playAgain}></Result>}
     </RoomContainer>
   );
+};
+
+Room.propTypes = {
+  gameId: PropTypes.string,
+  setScore: PropTypes.func,
 };
 
 export default Room;

@@ -9,4 +9,4 @@ export const device = {
   lg: `(min-width: ${size.lg})`,
 };
 
-export const SOCKET_URL = "http://localhost:8080";
+export const SOCKET_URL = "https://intense-woodland-39649.herokuapp.com/";

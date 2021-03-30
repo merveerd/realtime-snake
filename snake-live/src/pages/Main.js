@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../components";
@@ -19,7 +20,7 @@ const Main = (props) => {
   const dispatch = useDispatch();
   const socket = useContext(SocketContext);
 
-  const [inviteUrl, setInviteUrl] = useState(null);
+  const [inviteUrl, setInviteUrl] = useState("");
   const [copySuccess, setCopySuccess] = useState("");
   const startGame = (state) => {
     setInviteUrl(null);
@@ -59,8 +60,6 @@ const Main = (props) => {
 
   const newSingleGame = () => {
     socket.emit("newSingleGame");
-
-    socket.on("start", startGame);
     dispatch(setUserId(1));
   };
 
@@ -103,4 +102,9 @@ const Main = (props) => {
   );
 };
 
+Main.propTypes = {
+  inviteUrl: PropTypes.string,
+  copySuccess: PropTypes.string,
+  setRoomInfo: PropTypes.func,
+};
 export default Main;

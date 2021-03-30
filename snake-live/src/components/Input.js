@@ -1,6 +1,5 @@
 import React, { memo } from "react";
 import styled from "styled-components";
-import { device } from "../constants";
 import { font, bg, fontSize } from "../style/sharedStyle";
 const StyledInput = styled.input`
   width: auto;

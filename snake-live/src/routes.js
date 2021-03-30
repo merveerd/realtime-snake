@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Route, Switch } from "react-router-dom";
 import Main from "./pages/Main";
-import Room from "./pages/Room";
 import Join from "./pages/Join";
 const ROUTES = [
   {

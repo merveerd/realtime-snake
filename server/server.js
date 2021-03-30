@@ -17,7 +17,7 @@ const io = require("socket.io")(server, {
     methods: ["GET", "POST"],
   },
 });
-let counter = 18;
+let counter = 180;
 let serverInterval = (() => {
   let gameInterval;
   return {
@@ -35,7 +35,6 @@ io.on("connection", (socket) => {
     const room = io.sockets.adapter.rooms.get(gameId);
     let allUsers;
     if (room) {
-      console.log(room, room.size);
       allUsers = room.size;
     }
     if (!allUsers) {
@@ -143,7 +142,7 @@ io.on("connection", (socket) => {
   };
 
   const stopGame = () => {
-    counter = 18;
+    counter = 180;
     clearInterval(serverInterval.get());
   };
 

@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Button } from "../Button";
 import { font, fontSize } from "../../style/sharedStyle";
@@ -62,5 +63,7 @@ const Result = memo((props) => {
     </ResultContainer>
   );
 });
-
+Result.propTypes = {
+  score: PropTypes.array,
+};
 export { Result };

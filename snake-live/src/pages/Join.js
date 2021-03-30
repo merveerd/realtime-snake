@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Button } from "../components";
 import { SocketContext } from "../socketClient";
 import { setUserId, changeGameStatus } from "../actions";
 import { font, bg } from "../style/sharedStyle";
-import Room from "./Room";
+import Room from "../components/Room/Room";
 import { Container } from "../components/StyledContainer";
 const JoinContainer = styled(Container)`
   height: 100vh;
@@ -39,4 +40,11 @@ const Join = (props) => {
     </>
   );
 };
+
+Join.propTypes = {
+  roomActive: PropTypes.bool,
+  setUserId: PropTypes.func,
+  changeGameStatus: PropTypes.func,
+};
+
 export default Join;

@@ -1,5 +1,6 @@
 import React, { memo, useRef, useContext, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 import { SocketContext } from "../../socketClient";
 import { setScore } from "../../actions";
 const GameBoard = memo((props) => {
@@ -97,12 +98,16 @@ const GameBoard = memo((props) => {
 
   return (
     <canvas
-      // style={{ width: 800, height: 800 }}
+      style={{ width: 800, height: 800 }}
       width="800"
       height="800"
       ref={canvasRef}
     />
   );
 });
-
+GameBoard.propTypes = {
+  userId: PropTypes.number,
+  playerNumber: PropTypes.number,
+  gridNumber: PropTypes.number,
+};
 export { GameBoard };

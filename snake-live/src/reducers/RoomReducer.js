@@ -15,7 +15,7 @@ const INITIAL_STATE = {
   score: [{ 1: 0 }, { 2: 0 }],
 };
 
-export default (state = INITIAL_STATE, action) => {
+const State = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case SET_ROOM_INFO: {
       const gridNumber = action.payload.gridNumber;
@@ -43,3 +43,4 @@ export default (state = INITIAL_STATE, action) => {
       return state;
   }
 };
+export default State;

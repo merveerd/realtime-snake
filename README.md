@@ -9,3 +9,7 @@ redux and redux-thunk for state management
 ##### game rule note
 
 Once a one player leaves the room, game will automatically finish for both sides.
+
+### game link
+
+https://snake-realtime.netlify.app

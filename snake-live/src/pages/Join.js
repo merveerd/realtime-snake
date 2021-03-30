@@ -6,14 +6,10 @@ import { SocketContext } from "../socketClient";
 import { setUserId, changeGameStatus } from "../actions";
 import { font, bg } from "../style/sharedStyle";
 import Room from "./Room";
-
-const JoinContainer = styled.div`
-  width: 100%;
+import { Container } from "../components/StyledContainer";
+const JoinContainer = styled(Container)`
   height: 100vh;
-  display: flex;
-  justify-content: center;
   flex-direction: column;
-  align-items: center;
   ${bg.pinky};
   ${font.white}
 `;

@@ -1,23 +1,16 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import styled from "styled-components";
 import { Button } from "../Button";
 import { ScoreBoard } from "./ScoreBoard";
 import { Timer } from "./Timer";
-
-const BarContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+import { Container } from "../StyledContainer";
 
 const Bar = (props) => {
   const gameActive = useSelector((state) => state.roomResponse.gameActive);
 
   const [paused, setPaused] = useState(false);
   return (
-    <BarContainer>
+    <Container>
       <Timer remainedTime={props.remainedTime} />
       <ScoreBoard score={props.score}></ScoreBoard>
       <Button text="Cancel" onClick={props.cancelGame} />
@@ -40,7 +33,7 @@ const Bar = (props) => {
           }}
         />
       )}
-    </BarContainer>
+    </Container>
   );
 };
 

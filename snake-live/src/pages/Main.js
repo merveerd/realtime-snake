@@ -6,23 +6,12 @@ import { Button } from "../components";
 import { SocketContext } from "../socketClient";
 import { changeGameStatus, setRoomInfo, setUserId } from "../actions";
 import { font, bg } from "../style/sharedStyle";
-
-const MainContainer = styled.div`
-  width: 100%;
+import { Container } from "../components/StyledContainer";
+const MainContainer = styled(Container)`
   height: 100vh;
-  display: flex;
-  justify-content: center;
   flex-direction: column;
-  align-items: center;
   ${bg.pinky};
   ${font.white}
-`;
-
-const NewGameContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const Main = (props) => {
@@ -98,10 +87,10 @@ const Main = (props) => {
 
   return (
     <MainContainer>
-      <NewGameContainer>
+      <Container>
         <Button text=" Single Player" onClick={newSingleGame} />
         <Button text="Two Player" onClick={newTwoPlayerGame} />
-      </NewGameContainer>
+      </Container>
       {}
       {inviteUrl && (
         <h3 style={{ cursor: "pointer" }} onClick={copyToClipBoard}>

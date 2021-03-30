@@ -13,9 +13,6 @@ const Board = styled.div`
   ${font.white};
   margin: 1%;
   padding: 1%;
-  @media only screen and ${device.xs} {
-    height: 2rem;
-  }
 `;
 
 const Timer = (props) => {

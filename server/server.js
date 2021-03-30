@@ -31,33 +31,6 @@ let serverInterval = (() => {
 })();
 
 io.on("connection", (socket) => {
-  const stopGame = () => {
-    counter = 18;
-
-    clearInterval(serverInterval.get());
-  };
-
-  const finishGame = (gameId) => {
-    let gameState = state[gameId];
-    io.to(gameId).emit("timeOver", JSON.stringify({ gameState }));
-    stopGame();
-  };
-
-  const countDown = (gameId) => {
-    counter--;
-    io.to(gameId).emit("timer", counter);
-    if (counter == 0) {
-      finishGame(gameId);
-    }
-  };
-
-  const cancelGame = (gameId) => {
-    io.to(gameId).emit("canceled", true);
-    stopGame();
-
-    state[gameId] = null;
-  };
-
   const handleJoinGame = (gameId) => {
     const room = io.sockets.adapter.rooms.get(gameId);
     let allUsers;
@@ -69,7 +42,6 @@ io.on("connection", (socket) => {
       socket.emit("unknownCode");
       return;
     } else if (allUsers > 1) {
-      console.log("tooManyPlayers");
       socket.emit("tooManyPlayers");
       return;
     } else {
@@ -128,6 +100,14 @@ io.on("connection", (socket) => {
     }
   };
 
+  const countDown = (gameId) => {
+    counter--;
+    io.to(gameId).emit("timer", counter);
+    if (counter == 0) {
+      finishGame(gameId);
+    }
+  };
+
   const startLoop = (gameId) => {
     let gameCounter = 0;
 
@@ -162,6 +142,24 @@ io.on("connection", (socket) => {
     }
   };
 
+  const stopGame = () => {
+    counter = 18;
+    clearInterval(serverInterval.get());
+  };
+
+  const finishGame = (gameId) => {
+    let gameState = state[gameId];
+    io.to(gameId).emit("timeOver", JSON.stringify({ gameState }));
+    stopGame();
+  };
+
+  const cancelGame = (gameId) => {
+    io.to(gameId).emit("canceled", true);
+    stopGame();
+
+    state[gameId] = null;
+  };
+
   socket.on("disconnect", () => {
     let gameId = clientRooms[socket.id];
     cancelGame(gameId);
@@ -175,7 +173,7 @@ io.on("connection", (socket) => {
   socket.on("cancelGame", cancelGame);
 
   socket.on("pauseGame", (gameId) => {
-    clearInterval(gameInterval.get());
+    clearInterval(serverInterval.get());
     io.to(gameId).emit("paused", counter);
   });
   socket.on("restartGame", (gameId) => {

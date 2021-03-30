@@ -6,13 +6,10 @@ import { SocketContext } from "../socketClient";
 import { Bar, GameBoard, Result } from "../components";
 import { changeGameStatus, setScore, setRoomInfo } from "../actions";
 import { bg } from "../style/sharedStyle";
-const RoomContainer = styled.div`
-  width: 100%;
-  display: flex;
-  background-color: whitesmoke;
+import { Container } from "../components/StyledContainer";
+
+const RoomContainer = styled(Container)`
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   ${bg.whitesmoke};
 `;
 

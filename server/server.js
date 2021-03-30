@@ -13,7 +13,7 @@ const FRAME_RATE = 20,
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://6063491aae4fe01154fcce5d--snake-realtime.netlify.app",
+    origin: " https://snake-realtime.netlify.app",
     methods: ["GET", "POST"],
   },
 });
@@ -54,10 +54,7 @@ io.on("connection", (socket) => {
 
   const createTwoPlayerGame = () => {
     let gameId = makeid(10);
-    socket.emit(
-      "gameUrl",
-      `https://6063491aae4fe01154fcce5d--snake-realtime.netlify.app/${gameId}`
-    );
+    socket.emit("gameUrl", ` https://snake-realtime.netlify.app/${gameId}`);
     clientRooms[socket.id] = gameId;
     state[gameId] = initGame();
     state[gameId].playerNumber = 2;
@@ -190,6 +187,7 @@ server.on("error", (err) => {
   console.error(err);
 });
 
-server.listen(8080, () => {
-  console.log("server is running on 8080");
+const port = process.env.PORT || 8080;
+server.listen(port, () => {
+  console.log("server is running");
 });

@@ -9,7 +9,6 @@ const { makeid } = require("./utils");
 app.use(cors());
 const FRAME_RATE = 20,
   state = {},
-  allClients = [],
   clientRooms = {};
 
 const io = require("socket.io")(server, {
@@ -18,15 +17,24 @@ const io = require("socket.io")(server, {
     methods: ["GET", "POST"],
   },
 });
+let counter = 18;
+let serverInterval = (() => {
+  let gameInterval;
+  return {
+    set: (obj) => {
+      gameInterval = obj;
+    },
+    get: () => {
+      return gameInterval;
+    },
+  };
+})();
 
 io.on("connection", (socket) => {
-  let gameInterval,
-    counter = 18;
-  allClients.push(socket);
-
   const stopGame = () => {
     counter = 18;
-    clearInterval(gameInterval);
+
+    clearInterval(serverInterval.get());
   };
 
   const finishGame = (gameId) => {
@@ -44,13 +52,10 @@ io.on("connection", (socket) => {
   };
 
   const cancelGame = (gameId) => {
-    state[gameId] = null;
-    io.to(gameId).emit("canceled", counter);
+    io.to(gameId).emit("canceled", true);
     stopGame();
-  };
 
-  const pauseGame = (gameId) => {
-    stopGame();
+    state[gameId] = null;
   };
 
   const handleJoinGame = (gameId) => {
@@ -121,16 +126,22 @@ io.on("connection", (socket) => {
     }
   };
 
-  const startGameInterval = (gameId) => {
+  const startLoop = (gameId) => {
     let gameCounter = 0;
-    gameInterval = setInterval(() => {
-      gameCounter++;
-      if (gameCounter % FRAME_RATE === 0) {
-        countDown(gameId);
-      }
-      gameLoop(state[gameId]);
-      emitGameState(gameId, state[gameId]);
-    }, 1000 / FRAME_RATE);
+
+    serverInterval.set(
+      setInterval(() => {
+        gameCounter++;
+        if (gameCounter % FRAME_RATE === 0) {
+          countDown(gameId);
+        }
+        gameLoop(state[gameId]);
+        emitGameState(gameId, state[gameId]);
+      }, 1000 / FRAME_RATE)
+    );
+  };
+  const startGameInterval = (gameId) => {
+    startLoop(gameId);
   };
 
   const playAgain = (gameId) => {
@@ -150,7 +161,8 @@ io.on("connection", (socket) => {
   };
 
   socket.on("disconnect", () => {
-    allClients.splice(allClients.indexOf(socket), 1);
+    let gameId = clientRooms[socket.id];
+    cancelGame(gameId);
   });
 
   socket.on("keydown", handleKeydown);
@@ -159,14 +171,16 @@ io.on("connection", (socket) => {
   socket.on("secondJoined", handleJoinGame);
   socket.on("playAgain", playAgain);
   socket.on("cancelGame", cancelGame);
+
   socket.on("pauseGame", (gameId) => {
-    clearInterval(gameInterval);
+    clearInterval(gameInterval.get());
     io.to(gameId).emit("paused", counter);
   });
   socket.on("restartGame", (gameId) => {
     startGameInterval(gameId);
   });
   const emitGameState = (gameId, gameState) => {
+    //f  console.log("emit", gameState.playerNumber);
     io.to(gameId).emit("gameState", JSON.stringify(gameState));
   };
 });

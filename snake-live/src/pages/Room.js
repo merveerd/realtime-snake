@@ -52,7 +52,7 @@ const Room = (props) => {
     }
   };
 
-  const handleCancel = (counter) => {
+  const handleCancel = (data) => {
     dispatch(changeGameStatus({ gameActive: false, roomActive: false }));
     history.push("");
   };
@@ -63,6 +63,9 @@ const Room = (props) => {
     socket.on("joined", startGame);
     socket.on("start", startGame);
     socket.on("canceled", handleCancel);
+    socket.on("tooManyPlayers", () => {
+      history.push("");
+    });
 
     return () => {
       socket.off("timeOver", handleTimeOver);
@@ -70,6 +73,9 @@ const Room = (props) => {
       socket.off("joined", startGame);
       socket.off("start", startGame);
       socket.off("canceled", handleCancel);
+      socket.off("tooManyPlayers", () => {
+        history.push("");
+      });
     };
   }, []);
 

@@ -93,7 +93,7 @@ const gameLoop = (state) => {
       for (let cell of player.snake) {
         if (
           (cell.x === player.pos.x && cell.y === player.pos.y) ||
-          ((otherPlayer.vel.x || otherPlayer.vel.y) && //random die
+          ((otherPlayer.vel.x || otherPlayer.vel.y) &&
             cell.x === otherPlayer.pos.x &&
             cell.y === otherPlayer.pos.y &&
             state.lastPlayedPlayer === index + 1) //index+1 is equal to id in this game

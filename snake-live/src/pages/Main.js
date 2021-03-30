@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../components";
@@ -34,20 +34,24 @@ const Main = (props) => {
 
   const startGame = (state) => {
     setInviteUrl(null);
-    dispatch(
-      setRoomInfo({
-        gameId: state.gameId,
-        playerNumber: state.playerNumber,
-        gridNumber: state.gridNumber,
-      })
-    );
-    dispatch(
-      changeGameStatus({
-        gameActive: true,
-        roomActive: true,
-      })
-    );
-    history.push(`${state.gameId}`);
+    if (state) {
+      dispatch(
+        setRoomInfo({
+          gameId: state.gameId,
+          playerNumber: state.playerNumber,
+          gridNumber: state.gridNumber,
+        })
+      );
+      dispatch(
+        changeGameStatus({
+          gameActive: true,
+          roomActive: true,
+        })
+      );
+      history.push(`${state.gameId}`);
+    } else {
+      history.push("");
+    }
   };
 
   useEffect(() => {

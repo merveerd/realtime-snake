@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { Button } from "../Button";
 import { ScoreBoard } from "./ScoreBoard";
@@ -12,6 +13,8 @@ const BarContainer = styled.div`
 `;
 
 const Bar = (props) => {
+  const gameActive = useSelector((state) => state.roomResponse.gameActive);
+
   const [paused, setPaused] = useState(false);
   return (
     <BarContainer>
@@ -22,8 +25,10 @@ const Bar = (props) => {
         <Button
           text="Pause"
           onClick={() => {
-            setPaused(true);
-            props.pauseGame();
+            if (gameActive) {
+              setPaused(true);
+              props.pauseGame();
+            }
           }}
         />
       ) : (

@@ -54,7 +54,10 @@ io.on("connection", (socket) => {
 
   const createTwoPlayerGame = () => {
     let gameId = makeid(10);
-    socket.emit("gameUrl", `http://localhost:3000/${gameId}`);
+    socket.emit(
+      "gameUrl",
+      `https://6063491aae4fe01154fcce5d--snake-realtime.netlify.app/${gameId}`
+    );
     clientRooms[socket.id] = gameId;
     state[gameId] = initGame();
     state[gameId].playerNumber = 2;

@@ -9,4 +9,4 @@ export const device = {
   lg: `(min-width: ${size.lg})`,
 };
 
-export const SOCKET_URL = "https://intense-woodland-39649.herokuapp.com/";
+export const SOCKET_URL = "https://snake-realtime.herokuapp.com/";
